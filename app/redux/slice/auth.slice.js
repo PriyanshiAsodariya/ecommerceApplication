@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
+// import auth from '@react-native-firebase/auth';
+import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
 
 const initialState = {
     isLoading: false,
@@ -86,6 +88,67 @@ export const sigingoogle = createAsyncThunk(
     }
 )
 
+export const siginFacebook = createAsyncThunk(
+    'auth/signInFacebook',
+    async () => {
+        try {
+            // Attempt login with permissions
+            const result = await LoginManager.logInWithPermissions(['public_profile', "email"]);
+
+            if (result.isCancelled) {
+                console.log("Login cancelled");
+                throw 'User cancelled the login process';
+            }
+
+            // Once signed in, get the user's AccessToken
+            const data = await AccessToken.getCurrentAccessToken();
+
+            if (!data) {
+                throw 'Something went wrong obtaining access token';
+            }
+
+            // Create a Firebase credential with the AccessToken
+            const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
+
+            // Sign-in the user with the credential
+            const userCredential = await auth().signInWithCredential(facebookCredential);
+            
+            return userCredential.user; // Assuming you want to return the user object
+        } catch (error) {
+            console.error('Error signing in with Facebook:', error);
+            throw error; // Rethrow the error to be handled by Redux Toolkit
+        }
+    }
+);
+
+
+// export const siginFacebook = createAsyncThunk(
+//     'auth/siginFacebook',
+//     async () => {
+//         // Attempt login with permissions
+//         const result = await LoginManager.logInWithPermissions(['public_profile', 'email']);
+
+//         if (result.isCancelled) {
+//             console.log( "Login cancelled" );
+//             throw 'User cancelled the login process';
+//         }else{
+//             result.grantedPermissions.toString();
+//         }
+
+//         // Once signed in, get the users AccessToken
+//         const data = await AccessToken.getCurrentAccessToken();
+
+//         if (!data) {
+//             throw 'Something went wrong obtaining access token';
+//         }
+
+//         // Create a Firebase credential with the AccessToken
+//         const facebookCredential = auth.FacebookAuthProvider.credential(data.accessToken);
+
+//         // Sign-in the user with the credential
+//         return auth().signInWithCredential(facebookCredential);
+//     }
+// )
 
 
 export const authslice = createSlice({
@@ -94,10 +157,14 @@ export const authslice = createSlice({
     reducers: {},
     extraReducers: (builder) => {
         builder.addCase(Loginwithemail.fulfilled, (state, action) => {
-            console.log("productttttt actionnnn ", action);
+            // console.log("productttttt actionnnn ", action);
             state.user = action.payload
         })
         builder.addCase(sigingoogle.fulfilled, (state, action) => {
+            // console.log("productttttt actionnnn ", action);
+            state.user = action.payload
+        })
+        builder.addCase(siginFacebook.fulfilled, (state, action) => {
             console.log("productttttt actionnnn ", action);
             state.user = action.payload
         })

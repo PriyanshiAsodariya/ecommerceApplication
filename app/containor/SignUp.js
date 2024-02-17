@@ -8,7 +8,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { useDispatch } from 'react-redux';
-import { sigingoogle, signupwithEmail } from '../redux/slice/auth.slice';
+import { siginFacebook, sigingoogle, signupwithEmail } from '../redux/slice/auth.slice';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 
 export default function SignUp({ navigation }) {
@@ -120,7 +120,7 @@ export default function SignUp({ navigation }) {
         </Pressable>
         <Pressable
           style={style.btn}
-          onPress={() => ('')}>
+          onPress={() => dispatch(siginFacebook())}>
           <MaterialIcons name="facebook" color={'darkblue'} size={45} marginLeft={2} />
         </Pressable>
       </View>
