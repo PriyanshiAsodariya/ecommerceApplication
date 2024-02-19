@@ -3,6 +3,7 @@ import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 // import auth from '@react-native-firebase/auth';
 import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
+import firestore from '@react-native-firebase/firestore';
 
 const initialState = {
     isLoading: false,
@@ -17,8 +18,16 @@ export const signupwithEmail = createAsyncThunk(
         await auth()
             .createUserWithEmailAndPassword(data.email, data.password)
             .then(async (userCredential) => {
-                console.log('User account created & signed in!', userCredential);
+                console.log('User account created & signed in!', userCredential.user.uid);
                 await userCredential.user.sendEmailVerification();
+
+                await firestore()
+                    .collection('users')
+                    .doc(userCredential.user.uid)
+                    .set({ name: data.Name, email: data.email, emailVerified: false, createdAt: new Date().toString(), updateAt: new Date().toString() })
+                    .then(() => {
+                        console.log("Signup Successfully");
+                    })
             })
             .catch(error => {
                 if (error.code === 'auth/email-already-in-use') {
@@ -40,10 +49,18 @@ export const Loginwithemail = createAsyncThunk(
         console.log("ppppppppppppppppppppppppppppppppp", data);
         const user = await auth()
             .signInWithEmailAndPassword(data.email, data.password)
-            .then((user) => {
+            .then(async (user) => {
                 console.log(user);
                 if (user.user.emailVerified) {
-                    console.log('User account login in!');
+                    console.log('User account login in!', user);
+
+                    await firestore()
+                        .collection('users')
+                        .doc(user.user.uid)
+                        .update({ emailVerified: true })
+                        .then(() => {
+                            console.log('User updated!');
+                        });
 
                     return user.user;
                 } else {
@@ -112,7 +129,7 @@ export const siginFacebook = createAsyncThunk(
 
             // Sign-in the user with the credential
             const userCredential = await auth().signInWithCredential(facebookCredential);
-            
+
             return userCredential.user; // Assuming you want to return the user object
         } catch (error) {
             console.error('Error signing in with Facebook:', error);
