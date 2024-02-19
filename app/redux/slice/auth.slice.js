@@ -3,6 +3,8 @@ import auth from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 // import auth from '@react-native-firebase/auth';
 import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
+import firestore from '@react-native-firebase/firestore';
+
 
 const initialState = {
     isLoading: false,
@@ -17,6 +19,17 @@ export const signupwithEmail = createAsyncThunk(
         await auth()
             .createUserWithEmailAndPassword(data.email, data.password)
             .then(async (userCredential) => {
+                await firestore()
+                    .collection('user')
+                    .doc(userCredential.user.uid)
+                    .set({ Name: data.Name, id: userCredential.user.uid, createdAt: new Date().toString(), updateAt: new Date().toString() })
+                    .then(() => {
+                        // docId = doc.id;
+                        console.log("succesufully login");
+                    })
+                    .catch(error => console.log(error))
+
+
                 console.log('User account created & signed in!', userCredential);
                 await userCredential.user.sendEmailVerification();
             })
@@ -43,8 +56,15 @@ export const Loginwithemail = createAsyncThunk(
             .then((user) => {
                 console.log(user);
                 if (user.user.emailVerified) {
-                    console.log('User account login in!');
 
+                    firestore()
+                        .collection('user')
+                        .doc(data.id)
+                        .update({emailVerified : true})
+                        .then(() => {
+                            console.log('User updated!');
+                        });
+                    console.log('User account login in!');
                     return user.user;
                 } else {
                     console.log("Please verify your email.");
@@ -112,7 +132,7 @@ export const siginFacebook = createAsyncThunk(
 
             // Sign-in the user with the credential
             const userCredential = await auth().signInWithCredential(facebookCredential);
-            
+
             return userCredential.user; // Assuming you want to return the user object
         } catch (error) {
             console.error('Error signing in with Facebook:', error);
