@@ -1,9 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
-import auth from '@react-native-firebase/auth';
+import auth, { firebase } from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 // import auth from '@react-native-firebase/auth';
 import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
 import firestore from '@react-native-firebase/firestore';
+import { useSelector } from "react-redux";
+
 
 
 const initialState = {
@@ -22,7 +24,7 @@ export const signupwithEmail = createAsyncThunk(
                 await firestore()
                     .collection('user')
                     .doc(userCredential.user.uid)
-                    .set({ Name: data.Name, id: userCredential.user.uid, createdAt: new Date().toString(), updateAt: new Date().toString() })
+                    .set({ Name: data.Name, emailVerified: false, id: userCredential.user.uid, createdAt: new Date().toString(), updateAt: new Date().toString() })
                     .then(() => {
                         // docId = doc.id;
                         console.log("succesufully login");
@@ -59,8 +61,8 @@ export const Loginwithemail = createAsyncThunk(
 
                     firestore()
                         .collection('user')
-                        .doc(data.id)
-                        .update({emailVerified : true})
+                        .doc(user.user.uid)
+                        .update({ emailVerified: true })
                         .then(() => {
                             console.log('User updated!');
                         });
@@ -141,9 +143,40 @@ export const siginFacebook = createAsyncThunk(
     }
 );
 
+export const addAdress = createAsyncThunk(
+    'auth/addAddress',
+    async (data) => {
+        console.log("ddddddddddddddddddddddddddddd", data, data.id);
 
+        //update    uid     
+        await firestore()
+            .collection('user')
+            .doc(data.id)
+            // .update({ address: data.address })
+            .update({
+                address: firebase.firestore.FieldValue.arrayUnion(data.address)
+            })
+            .then(() => {
+                console.log('User updated!');
+            });
 
+        let userData;
+        await firestore()
+            .collection('user')
+            .doc(data.id)
+            .get()
+            .then(documentSnapshot => {
+                console.log('User exists: ', documentSnapshot.exists);
 
+                if (documentSnapshot.exists) {
+                    console.log('User data: ', documentSnapshot.data());
+                    userData = documentSnapshot.data();
+                }
+            });
+
+            return {...userData , uid : data.id}
+    }
+)
 
 export const authslice = createSlice({
     name: 'auth',
@@ -159,12 +192,14 @@ export const authslice = createSlice({
             state.user = action.payload
         })
         builder.addCase(siginFacebook.fulfilled, (state, action) => {
-            console.log("productttttt actionnnn ", action);
+            // console.log("productttttt actionnnn ", action);
+            state.user = action.payload
+        })
+        builder.addCase(addAdress.fulfilled, (state, action) => {
+            console.log("productttttt actionnnn ", action.payload);
+
             state.user = action.payload
         })
     }
-
 })
-
-
 export default authslice.reducer

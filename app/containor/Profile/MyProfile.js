@@ -2,6 +2,7 @@ import { View, Text, Image } from 'react-native'
 import React from 'react'
 import Profileinput from '../../components/Profileinput'
 import { horizontalScale, moderateScale, verticalScale } from '../../Constant/Metrics'
+import Address from '../Cart/Address'
 
 
 export default function MyProfile({navigation}) {
@@ -30,6 +31,7 @@ export default function MyProfile({navigation}) {
       <Profileinput
         name="ShippingAddracs"
         titel="3 ddresses"
+        onPress={()=>navigation.navigate('Address')}
       />
 
       <Profileinput
