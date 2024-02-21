@@ -146,24 +146,60 @@ export const siginFacebook = createAsyncThunk(
 export const addAdress = createAsyncThunk(
     'auth/addAddress',
     async (data) => {
-        console.log("ddddddddddddddddddddddddddddd", data, data.id);
+        console.log("ddddddddddddddddddddddddddddd", data, data.uid);
 
         //update    uid     
         await firestore()
             .collection('user')
-            .doc(data.id)
+            .doc(data.uid)
             // .update({ address: data.address })
             .update({
                 address: firebase.firestore.FieldValue.arrayUnion(data.address)
             })
             .then(() => {
-                console.log('User updated!');
+                console.log('address add!');
             });
 
         let userData;
         await firestore()
             .collection('user')
-            .doc(data.id)
+            .doc(data.uid)
+            .get()
+            .then(documentSnapshot => {
+                console.log('User exists: ', documentSnapshot.exists);
+
+                if (documentSnapshot.exists) {
+                    console.log('User data: ', documentSnapshot.data());
+                    userData = documentSnapshot.data();
+                }
+            });
+        return { ...userData, uid: data.uid }
+    }
+)
+
+export const deleteAddress = createAsyncThunk(
+    'auth/deleteAddress',
+    async (data) => {
+        console.log("hhhhhhhhhhhhhhhhhhhhhhhhhhhhh", data);
+        try {
+            await firestore()
+                .collection('user')
+                .doc(data.uid)
+                // .update({ address: data.address })
+                .update({
+                    address: firebase.firestore.FieldValue.arrayRemove(data.address)
+                })
+                .then(() => {
+                    console.log('address delete!');
+                });
+        } catch (error) {
+            console.log("eeeeeeeeeeeeeeee", error);
+        }
+
+        let userData;
+        await firestore()
+            .collection('user')
+            .doc(data.uid)
             .get()
             .then(documentSnapshot => {
                 console.log('User exists: ', documentSnapshot.exists);
@@ -174,10 +210,63 @@ export const addAdress = createAsyncThunk(
                 }
             });
 
-            return {...userData , uid : data.id}
+        return { ...userData, uid: data.uid };
     }
 )
 
+export const editAddress = createAsyncThunk(
+    'auth/editAddress',
+    async (data) => {
+        console.log("eddddiiitttttttttttt", data);
+        try {
+            await firestore()
+                .collection('user')
+                .doc(data.uid)
+                // .update({ address: data.address })
+                .update({
+                    address: firebase.firestore.FieldValue.arrayRemove(data.olddata)
+                })
+                .then(() => {
+                    console.log('address delete!');
+                });
+        } catch (error) {
+            console.log("eeeeeeeeeeeeeeee", error);
+        }
+
+        await firestore()
+            .collection('user')
+            .doc(data.uid)
+            // .update({ address: data.address })
+            .update({
+                address: firebase.firestore.FieldValue.arrayUnion(data.address)
+            })
+            .then(() => {
+                console.log('address add!');
+            });
+
+        let userData;
+        await firestore()
+            .collection('user')
+            .doc(data.uid)
+            .get()
+            .then(documentSnapshot => {
+                console.log('User exists: ', documentSnapshot.exists);
+
+                if (documentSnapshot.exists) {
+                    console.log('User data: ', documentSnapshot.data());
+                    userData = documentSnapshot.data();
+                }
+            });
+        return { ...userData, uid: data.uid }
+
+    }
+
+
+
+
+
+
+)
 export const authslice = createSlice({
     name: 'auth',
     initialState,
@@ -196,9 +285,22 @@ export const authslice = createSlice({
             state.user = action.payload
         })
         builder.addCase(addAdress.fulfilled, (state, action) => {
-            console.log("productttttt actionnnn ", action.payload);
+            // console.log("productttttt actionnnn ", action.payload);
 
             state.user = action.payload
+        })
+        builder.addCase(deleteAddress.fulfilled, (state, action) => {
+            //     console.log("productttttt actionnnn ", action.payload);
+
+            state.user = action.payload
+            // state.user = action.payload ? [...state.user, action.payload] : state.user;
+
+        })
+        builder.addCase(editAddress.fulfilled, (state, action) => {
+          
+console.log("actionnnnnnnnnnnnnn",action.payload);
+            state.user = action.payload
+          
         })
     }
 })

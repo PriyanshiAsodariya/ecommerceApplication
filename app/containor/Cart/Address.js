@@ -1,14 +1,19 @@
-import { View, Text, ScrollView } from 'react-native'
-import React from 'react'
+import { View, Text, ScrollView, StyleSheet, FlatList, SafeAreaView, TouchableOpacity } from 'react-native'
+import React, { useState } from 'react'
 import AppInput from '../../components/InputBox/AppInput'
 import AppButton from '../../components/Button/AppButton'
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { useDispatch, useSelector } from 'react-redux';
-import { addAdress } from '../../redux/slice/auth.slice';
+import { addAdress, deleteAddress, deleteAdress, editAddress } from '../../redux/slice/auth.slice';
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 
 export default function Address({ navigation }) {
+  const [update, setupdate] = useState(false)
+  const [olddata, setolddata] = useState(null)
+  
 
   const addresSceheme = yup.object({
     name: yup.string().required(),
@@ -22,9 +27,19 @@ export default function Address({ navigation }) {
   const dispatch = useDispatch()
 
   const auth = useSelector(state => state.auth)
-  console.log("7777777777777",auth.user.uid);
-  console.log("8888888888888",auth);
+  
 
+  const handleDelete = (user) => {
+    // console.log("55555555555555555555555555555555555555",user);
+    dispatch(deleteAddress({ address: user, uid: auth.user.uid }))
+  }
+
+  const handleEdit = (user) => {
+    // dispatch(editAddress(user))
+    setValues(user)
+    setolddata(user)
+    setupdate(true)
+  }
 
   const formik = useFormik({
     initialValues: {
@@ -40,21 +55,47 @@ export default function Address({ navigation }) {
     onSubmit: (values, { resetForm }) => {
       console.log("*************************************", values)
 
-      dispatch(addAdress({ address : values ,id:auth.user.uid }))
-      // setupdate(false)
+      if (update) {
+        console.log("updateeeeeeeeeeeeeeeeeee");
+        dispatch(editAddress({ address: values, olddata ,uid: auth.user.uid }))
+      } else {
+      dispatch(addAdress({ address: values, uid: auth.user.uid }))
+      }
+
+      setupdate(false)
       resetForm();
     },
   })
 
-  const { handleChange, handleBlur, setValues, touched, handleSubmit, errors, values } = formik;
+  const { handleChange, handleBlur, setValues, touched, handleSubmit, errors, values, } = formik;
 
+  console.log("kkkkkkkkkkkkkkkkkkkkkk",errors);
 
-
+  const List = ({ user }) => {
+    // console.log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu", user);
+    return (
+      <View style={style.container}>
+        <Text style={style.text}> address : {user.address}</Text>
+        <Text style={style.text}> city : {user.city}</Text>
+        <Text style={style.text}> country : {user.country}</Text>
+        <Text style={style.text}> pinCode : {user.pinCode}</Text>
+        <Text style={style.text}> state : {user.state}</Text>
+        <View style={{ flexDirection: 'row', marginTop: 15 }}>
+          <TouchableOpacity onPress={() => handleEdit(user)}>
+            <FontAwesome style={style.icon} name="edit" color={'red'} size={25} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => handleDelete(user)}>
+            <MaterialCommunityIcons style={style.icon} name="delete" color={'red'} size={25} />
+          </TouchableOpacity>
+        </View>
+      </View>
+    )
+  }
   return (
     <View>
       <ScrollView>
         <AppInput
-         name='name'
+          name='name'
           onChangeText={handleChange('name')}
           onBlur={handleBlur('name')}
           value={values.name}
@@ -65,7 +106,7 @@ export default function Address({ navigation }) {
 
 
         <AppInput
-         name='address'
+          name='address'
           onChangeText={handleChange('address')}
           onBlur={handleBlur('address')}
           value={values.address}
@@ -76,7 +117,7 @@ export default function Address({ navigation }) {
 
 
         <AppInput
-         name='city'
+          name='city'
           onChangeText={handleChange('city')}
           onBlur={handleBlur('city')}
           value={values.city}
@@ -87,7 +128,7 @@ export default function Address({ navigation }) {
         {touched.city && errors.city ? <Text>{errors.city}</Text> : null}
 
         <AppInput
-         name='state'
+          name='state'
           onChangeText={handleChange('state')}
           onBlur={handleBlur('state')}
           value={values.state}
@@ -97,7 +138,7 @@ export default function Address({ navigation }) {
         {touched.state && errors.state ? <Text>{errors.state}</Text> : null}
 
         <AppInput
-         name='pinCode'
+          name='pinCode'
           onChangeText={handleChange('pinCode')}
           onBlur={handleBlur('pinCode')}
           value={values.pinCode}
@@ -108,7 +149,7 @@ export default function Address({ navigation }) {
 
 
         <AppInput
-         name='country'
+          name='country'
           onChangeText={handleChange('country')}
           onBlur={handleBlur('country')}
           value={values.country}
@@ -120,15 +161,45 @@ export default function Address({ navigation }) {
         <View style={{ marginTop: 40 }}>
           <AppButton
             titel="SAVE ADDRESS"
-            onPress={() => handleSubmit()}
+            onPress={handleSubmit}
           // onPress={() =>{ navigation.navigate('Payment'), handleSubmit()}}
           />
+          <View>
+            <FlatList
+              data={auth.user.address}
+              renderItem={({ item }) => <List user={item} />}
+              keyExtractor={item => item.id}
+            />
+          </View>
         </View>
 
-
-       
-
       </ScrollView>
+
     </View>
   )
 }
+
+const style = StyleSheet.create({
+  item: {
+    backgroundColor: '#f9c2ff',
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
+  },
+  title: {
+    fontSize: 32,
+  },
+  container: {
+    borderWidth: 2,
+    margin: 10,
+    padding: 10,
+    borderRadius: 25,
+  },
+  text: {
+    color: 'black',
+    fontSize: 20
+  },
+  icon: {
+    marginHorizontal: 16,
+  }
+})
