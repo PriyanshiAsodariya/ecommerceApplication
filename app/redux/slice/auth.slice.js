@@ -6,6 +6,7 @@ import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
 import firestore from '@react-native-firebase/firestore';
 import { useSelector } from "react-redux";
 
+import storage from '@react-native-firebase/storage';
 
 
 const initialState = {
@@ -24,7 +25,7 @@ export const signupwithEmail = createAsyncThunk(
                 await firestore()
                     .collection('user')
                     .doc(userCredential.user.uid)
-                    .set({ Name: data.Name, emailVerified: false, id: userCredential.user.uid, createdAt: new Date().toString(), updateAt: new Date().toString() })
+                    .set({ Name: data.Name, email : data.email,emailVerified: false, id: userCredential.user.uid, createdAt: new Date().toString(), updateAt: new Date().toString() })
                     .then(() => {
                         // docId = doc.id;
                         console.log("succesufully login");
@@ -267,6 +268,47 @@ export const editAddress = createAsyncThunk(
 
 
 )
+
+export const profileAdd = createAsyncThunk(
+    'auth/profile',
+    async  (data) =>{
+        console.log("profilllllllllleeeeeeeeee",data);
+
+        console.log(data.values.image.path);
+
+        let alldata = {...data}
+
+        let temparr = data.values.image.path.split('/')
+        // console.log("aaaaaaaarrrrr",temparr);
+
+        let imgName = temparr[temparr.length-1];
+        console.log("imgggggggggggggggggggg",imgName);
+
+        const mathId = Math.floor(Math.random() * 1000);
+
+        const imgfinalName = mathId + '--' + imgName;
+        console.log("finnaalllllll",imgfinalName);
+
+        const imgRefPath = 'Profile/' + imgfinalName;
+
+        const imgRef = await storage().ref(imgRefPath);
+
+        const task = await imgRef.putFile(data.values.image.path);
+
+        
+        console.log("ppppppppppppppppppppppppppppppppppppppppp", imgRefPath);
+        const url = await storage().ref(imgRefPath).getDownloadURL();
+        console.log("uuuuuuuuuuuuuuuuuuuu", url);
+
+        await firestore()
+        .collection('user')
+        .doc(data.uid)
+        .update({ number: data.values.number ,imgName : imgfinalName ,imgURL : url })
+        .then(() => {
+            console.log('number add!');
+        });
+    }
+)
 export const authslice = createSlice({
     name: 'auth',
     initialState,
@@ -305,3 +347,5 @@ console.log("actionnnnnnnnnnnnnn",action.payload);
     }
 })
 export default authslice.reducer
+
+//console.log.*$

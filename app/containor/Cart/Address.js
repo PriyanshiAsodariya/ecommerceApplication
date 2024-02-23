@@ -168,7 +168,7 @@ export default function Address({ navigation }) {
             <FlatList
               data={auth.user.address}
               renderItem={({ item }) => <List user={item} />}
-              keyExtractor={item => item.id}
+              keyExtractor={item => item.i}
             />
           </View>
         </View>
