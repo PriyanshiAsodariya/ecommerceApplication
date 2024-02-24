@@ -25,7 +25,7 @@ export const signupwithEmail = createAsyncThunk(
                 await firestore()
                     .collection('user')
                     .doc(userCredential.user.uid)
-                    .set({ Name: data.Name, email : data.email,emailVerified: false, id: userCredential.user.uid, createdAt: new Date().toString(), updateAt: new Date().toString() })
+                    .set({ Name: data.Name, email: data.email, emailVerified: false, id: userCredential.user.uid, createdAt: new Date().toString(), updateAt: new Date().toString() })
                     .then(() => {
                         // docId = doc.id;
                         console.log("succesufully login");
@@ -271,44 +271,174 @@ export const editAddress = createAsyncThunk(
 
 export const profileAdd = createAsyncThunk(
     'auth/profile',
-    async  (data) =>{
-        console.log("profilllllllllleeeeeeeeee",data);
+    async (data) => {
+        console.log("mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",data.imgUrl);
+        if (typeof data.imgUrl === 'string') {
+           
 
-        console.log(data.values.image.path);
+            const oldImgRef = storage().ref('Profile/' + data.imgName);
+            await oldImgRef.delete();
 
-        let alldata = {...data}
+        }
 
-        let temparr = data.values.image.path.split('/')
-        // console.log("aaaaaaaarrrrr",temparr);
+            console.log("profilllllllllleeeeeeeeee", data);
 
-        let imgName = temparr[temparr.length-1];
-        console.log("imgggggggggggggggggggg",imgName);
+            console.log(data.image.path);
 
-        const mathId = Math.floor(Math.random() * 1000);
+            let temparr = data.image.path.split('/')
+            let imgName = temparr[temparr.length - 1];
 
-        const imgfinalName = mathId + '--' + imgName;
-        console.log("finnaalllllll",imgfinalName);
+            const mathId = Math.floor(Math.random() * 1000);
 
-        const imgRefPath = 'Profile/' + imgfinalName;
+            const imgfinalName = mathId + '--' + imgName;
+            const imgRefPath = 'Profile/' + imgfinalName;
 
-        const imgRef = await storage().ref(imgRefPath);
+            const imgRef = await storage().ref(imgRefPath);
+            const task = await imgRef.putFile(data.image.path);
 
-        const task = await imgRef.putFile(data.values.image.path);
+            console.log("ppppppppppppppppppppppppppppppppppppppppp", imgRefPath);
+            const url = await storage().ref(imgRefPath).getDownloadURL();
+            console.log("uuuuuuuuuuuuuuuuuuuu", url);
 
+            await firestore()
+                .collection('user')
+                .doc(data.uid)
+                .update({ imgName: imgfinalName, imgUrl: url, number: data.number })
+                .then(() => {
+                    console.log('Profile image and number updated successfully!');
+                });
         
-        console.log("ppppppppppppppppppppppppppppppppppppppppp", imgRefPath);
-        const url = await storage().ref(imgRefPath).getDownloadURL();
-        console.log("uuuuuuuuuuuuuuuuuuuu", url);
 
+        let userData;
         await firestore()
-        .collection('user')
-        .doc(data.uid)
-        .update({ number: data.values.number ,imgName : imgfinalName ,imgURL : url })
-        .then(() => {
-            console.log('number add!');
-        });
+            .collection('user')
+            .doc(data.uid)
+            .get()
+            .then(documentSnapshot => {
+                console.log('User exists: ', documentSnapshot.exists);
+
+                if (documentSnapshot.exists) {
+                    console.log('User data: ', documentSnapshot.data());
+                    userData = documentSnapshot.data();
+                }
+            });
+        return { ...userData, uid: data.uid }
     }
 )
+
+export const userInfo = createAsyncThunk(
+    'auth/userInfo',
+    async (data) => {
+        console.log("okkkkkkkkkkkkkkkkk", data);
+        let userData;
+        await firestore()
+        .collection('user')
+        .doc(data)
+        .get()
+        .then(documentSnapshot => {
+            console.log('User exists: ', documentSnapshot.exists);
+
+            if (documentSnapshot.exists) {
+                console.log('User data: ', documentSnapshot.data());
+                userData = documentSnapshot.data();
+            }
+        });
+    return { ...userData, uid: data }
+    }
+)
+
+    // export const profileAdd = createAsyncThunk(
+    //     'auth/profile',
+    //     async (data) => {
+    //         try {
+    //             // Check if the old image exists
+    //             const oldImgRef = storage().ref(imgRefPath);
+    //             const oldImgExists = await oldImgRef.exists();
+
+    //             // If the old image exists, delete it
+    //             if (oldImgExists) {
+    //                 await oldImgRef.delete();
+    //                 console.log('Old image deleted successfully');
+    //             } else {
+    //                 console.log('Old image does not exist');
+    //             }
+
+    //             // Upload the new image
+    //             const temparr = data.image.path.split('/')
+    //             const imgName = temparr[temparr.length - 1];
+
+    //             const mathId = Math.floor(Math.random() * 1000);
+
+    //             const imgfinalName = mathId + '--' + imgName;
+    //             const imgRefPath = 'Profile/' + imgfinalName;
+    //             const imgRef = storage().ref(imgRefPath);
+    //             await imgRef.putFile(data.values.image.path);
+
+    //             // Get the download URL of the new image
+    //             const url = await imgRef.getDownloadURL();
+
+    //             // Update user profile in Firestore with the new image details
+    //             await firestore()
+    //                 .collection('user')
+    //                 .doc(data.uid)
+    //                 .update({ imgName: imgName, imgUrl: url, number: data.values.number });
+
+    //             console.log('Profile image updated successfully!');
+    //         } catch (error) {
+    //             console.error('Error updating profile image:', error);
+    //             // Handle errors appropriately
+    //         }
+    //     }
+    // );
+
+    // export const profileAdd = createAsyncThunk(
+    //     'auth/profile',
+    //     async (data) => {
+    //         try {
+    //             // Attempt to delete the old image
+
+    //             const storageRef = storage().ref();
+    //             const oldImgRef = storageRef.child(imgRefPath);
+
+    //             await oldImgRef.delete();
+    //             console.log('Old image deleted successfully');
+    //         } catch (error) {
+    //             // Handle errors during deletion
+    //             if (error.code === 'storage/object-not-found') {
+    //                 // Ignore this error since it means the object doesn't exist
+    //                 console.log('Old image does not exist');
+    //             } else {
+    //                 // Handle other errors
+    //                 console.error('Error deleting old image:', error);
+    //             }
+    //         }
+
+    //         // Upload the new image
+    //         const temparr = data.values.image.path.split('/')
+    //         const imgName = temparr[temparr.length - 1];
+
+    //         const mathId = Math.floor(Math.random() * 1000);
+
+    //         const imgfinalName = mathId + '--' + imgName;
+    //         const imgRefPath = 'Profile/' + imgfinalName;
+    //         const imgRef = storage().ref(imgRefPath);
+    //         await imgRef.putFile(data.values.image.path);
+
+    //         // Get the download URL of the new image
+    //         const url = await imgRef.getDownloadURL();
+
+    //         // Update user profile in Firestore with the new image details
+    //         await firestore()
+    //             .collection('user')
+    //             .doc(data.uid)
+    //             .update({ imgName: imgName, imgUrl: url, number: data.values.number });
+
+    //         console.log('Profile image updated successfully!');
+    //     }
+    // );
+
+    ;
+
 export const authslice = createSlice({
     name: 'auth',
     initialState,
@@ -339,13 +469,71 @@ export const authslice = createSlice({
 
         })
         builder.addCase(editAddress.fulfilled, (state, action) => {
-          
-console.log("actionnnnnnnnnnnnnn",action.payload);
+
+            console.log("actionnnnnnnnnnnnnn", action.payload);
             state.user = action.payload
-          
+
+        })
+        builder.addCase(userInfo.fulfilled, (state, action) => {
+            // console.log("productttttt actionnnn ", action);
+            state.user = action.payload
+        })
+        builder.addCase(profileAdd.fulfilled, (state, action) => {
+            // console.log("productttttt actionnnn ", action);
+            state.user = action.payload
         })
     }
 })
+
+
 export default authslice.reducer
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 //console.log.*$
+
+
+
+  // async (data) => {
+        //     console.log("profilllllllllleeeeeeeeee", data);
+
+        //     console.log(data.values.image.path);
+
+        //     let temparr = data.values.image.path.split('/')
+        //     let imgName = temparr[temparr.length - 1];
+
+        //     const mathId = Math.floor(Math.random() * 1000);
+
+        //     const imgfinalName = mathId + '--' + imgName;
+
+
+        //     const imgRefPath = 'Profile/' + imgfinalName;
+
+        //     const imgRef = await storage().ref(imgRefPath);
+        //     const task = await imgRef.putFile(data.values.image.path);
+
+
+        //     console.log("ppppppppppppppppppppppppppppppppppppppppp", imgRefPath);
+        //     const url = await storage().ref(imgRefPath).getDownloadURL();
+        //     console.log("uuuuuuuuuuuuuuuuuuuu", url);
+
+         
+        //     await firestore()
+        //         .collection('user')
+        //         .doc(data.uid)
+        //         .update({ imgName: imgfinalName, imgUrl: url, number: data.values.number })
+        //         .then(() => {
+        //             console.log('number add!');
+        //         });
+        // }

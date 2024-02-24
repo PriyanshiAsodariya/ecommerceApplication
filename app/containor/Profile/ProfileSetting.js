@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, TouchableOpacity, Image, Button, Modal, TextInput } from 'react-native'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -8,7 +8,7 @@ import { horizontalScale, verticalScale } from '../../Constant/Metrics';
 import MyProfile from './MyProfile';
 import { useFormik } from 'formik';
 import * as yup from 'yup';
-import { profileAdd } from '../../redux/slice/auth.slice';
+import { profileAdd, userInfo } from '../../redux/slice/auth.slice';
 
 export default function ProfileSetting({ navigation }) {
     const [modal, setmodel] = useState(false)
@@ -24,9 +24,15 @@ export default function ProfileSetting({ navigation }) {
         setmodel(false)
     }
 
+    
+
     const auth = useSelector(state => state.auth)
     // console.log("nameeee", auth.user.Name);
-    // console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", auth);
+    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", auth);
+
+    // useEffect(() => {
+    //     dispatch(userInfo(auth.user.uid))
+    // }, [])
 
     const upload = () => {
         name = 'image'
@@ -64,7 +70,7 @@ export default function ProfileSetting({ navigation }) {
         onSubmit: (values, { resetForm }) => {
             // console.log("******************", values)
 
-            dispatch(profileAdd({values, uid : auth.user.uid}))
+            dispatch(profileAdd({...auth.user, ...values, uid : auth.user.uid}))
 
             resetForm();
         }
@@ -82,7 +88,7 @@ export default function ProfileSetting({ navigation }) {
 
             <View style={{ width: 150, height: 150, backgroundColor: 'black', borderRadius: 100, alignSelf: 'center', marginTop: 20, position: 'relative' }}>
                 <Image
-                    source={require('../../../assets/Images/profile.jpg')}
+                    source={auth.user?.imgUrl ? auth.user.imgUrl : require('../../../assets/Images/profile.jpg')}
                     style={{ width: '100%', height: '100%', borderRadius: 100 }}
                 />
                 <TouchableOpacity onPress={handleModal}>
