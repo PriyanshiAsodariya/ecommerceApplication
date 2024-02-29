@@ -49,7 +49,7 @@ export default function MyOrder({ navigation }) {
                     Amount={items.price * items.quantity}
                     Status={v1.status}
                   />
-                // </>
+                
               )
             })
           })
