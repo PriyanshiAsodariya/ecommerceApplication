@@ -8,6 +8,7 @@ import cartSlice from "../slice/cart.slice";
 import favouriteSlice from "../slice/favourite.slice";
 import crudSlice from "../slice/crud.slice";
 import authslice from "../slice/auth.slice";
+import orderSlice from "../slice/orderSlice";
 
 
 
@@ -19,5 +20,6 @@ export const rootReducer = combineReducers({
     cart : cartSlice,
     favourite : favouriteSlice,
     crud : crudSlice,
-    auth: authslice
+    auth: authslice,
+    order : orderSlice,
 })

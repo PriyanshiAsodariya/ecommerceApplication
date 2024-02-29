@@ -7,6 +7,8 @@ import BagCard from '../../components/card/BagCard';
 import { horizontalScale, moderateScale, verticalScale } from '../../Constant/Metrics';
 import { useDispatch, useSelector } from 'react-redux';
 import { decrementCart, incrementCart, removeCart } from '../../redux/slice/cart.slice';
+import CheckOut from './CheckOut';
+import { AddOrder } from '../../redux/slice/orderSlice';
 
 export default function MyBag({ navigation }) {
   const dispatch = useDispatch()
@@ -14,35 +16,34 @@ export default function MyBag({ navigation }) {
   const productData = useSelector(state => state.Product)
   const cartdata = useSelector(state => state.cart)
 
-
   const allcartData = cartdata.cart.map((c) => {
     const productobj = productData.Product.find((v) => v.id === c.id)
-
     return { ...productobj, quantity: c.quantity }
   })
 
-  // console.log(allcartData, "cartttttttttttttttttttttttttt");
+  const pricedata = allcartData.map((p)=>{
+    console.log(p,"ppppppppppppp");
+    const pdata = cartdata.cart.find((c)=> c.id === p.id)
+    return {...pdata , price : p.price}
+  })
 
-  const totalamount = allcartData.reduce((acc , v , i)=> acc + (v.price * v.quantity),0)
 
-  const handleIncrement = (data) =>{
+  console.log(pricedata,"jjjjjjjjjjjjjj");
+
+  
+  const totalamount = allcartData.reduce((acc, v, i) => acc + (v.price * v.quantity), 0)
+
+  const handleIncrement = (data) => {
     console.log(data);
     dispatch(incrementCart(data))
   }
-
-  const handleDecremet = (data) =>{
-    // console.log(data,"deccccccccccccccccccccccccccccccccccc");
+  const handleDecremet = (data) => {
     dispatch(decrementCart(data))
   }
-
-  const handleRemove = (id) =>{
-    console.log("idddddddddddddd" , id);
+  const handleRemove = (id) => {
     dispatch(removeCart(id))
   }
 
-  const HandleAction = () => {
-    navigation.navigate('Address')
-  }
   return (
     <View>
       <Text style={{ color: 'black', fontSize: moderateScale(40), fontWeight: '500', marginHorizontal: horizontalScale(16), marginTop: verticalScale(50) }}>My Bag</Text>
@@ -91,12 +92,9 @@ export default function MyBag({ navigation }) {
       <View style={{ marginTop: verticalScale(10) }}>
         <AppButton
           titel="CHECK OUT"
-          onPress={() => HandleAction()}
+          onPress={() => navigation.navigate('CheckOut', { pdata: pricedata, total :totalamount})}
         />
       </View>
-
-
-
     </View>
   )
 }

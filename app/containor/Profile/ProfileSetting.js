@@ -24,15 +24,12 @@ export default function ProfileSetting({ navigation }) {
         setmodel(false)
     }
 
-    
+
 
     const auth = useSelector(state => state.auth)
-    // console.log("nameeee", auth.user.Name);
-    console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", auth);
 
-    // useEffect(() => {
-    //     dispatch(userInfo(auth.user.uid))
-    // }, [])
+    // console.log("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA", auth);
+
 
     const upload = () => {
         name = 'image'
@@ -70,7 +67,7 @@ export default function ProfileSetting({ navigation }) {
         onSubmit: (values, { resetForm }) => {
             // console.log("******************", values)
 
-            dispatch(profileAdd({...auth.user, ...values, uid : auth.user.uid}))
+            dispatch(profileAdd({ ...auth.user, ...values, uid: auth.user.uid }))
 
             resetForm();
         }
@@ -86,14 +83,15 @@ export default function ProfileSetting({ navigation }) {
                 <MaterialIcons style={style.icon} name="keyboard-arrow-left" color={'black'} size={34} />
             </TouchableOpacity>
 
-            <View style={{ width: 150, height: 150, backgroundColor: 'black', borderRadius: 100, alignSelf: 'center', marginTop: 20, position: 'relative' }}>
+            <View style={{ width: 150, height: 150, backgroundColor: 'black', borderRadius: 100, alignSelf: 'center', marginTop: 20 }}>
                 <Image
                     source={auth.user?.imgUrl ? auth.user.imgUrl : require('../../../assets/Images/profile.jpg')}
-                    style={{ width: '100%', height: '100%', borderRadius: 100 }}
                 />
-                <TouchableOpacity onPress={handleModal}>
-                    <MaterialIcons style={style.camera} name="camera-alt" color={'black'} size={34} /></TouchableOpacity>
             </View>
+            
+            <TouchableOpacity onPress={handleModal}>
+                <MaterialIcons style={style.camera} name="camera-alt" color={'black'} size={34} />
+            </TouchableOpacity>
 
             <Modal
                 animationType="slide"
@@ -114,7 +112,6 @@ export default function ProfileSetting({ navigation }) {
                             <MaterialIcons style={style.camera1} name="photo-library" color={'black'} size={34} />
                         </TouchableOpacity>
                     </View>
-
                 </View>
             </Modal>
 
@@ -139,7 +136,7 @@ export default function ProfileSetting({ navigation }) {
                     placeholder='Enter your Number..!'
                     keyboardType='numeric'
                 />
-                  {touched.number && errors.number ? <Text>{errors.number}</Text> : null}
+                {touched.number && errors.number ? <Text>{errors.number}</Text> : null}
 
             </View>
             <TouchableOpacity style={style.submit} onPress={handleSubmit}>
@@ -160,14 +157,13 @@ const style = StyleSheet.create({
         position: 'absolute',
         borderRadius: 20,
         bottom: 10,
-        right: 0,
+        right: 120,
         color: 'green',
         backgroundColor: 'white',
         width: 40,
         textAlign: 'center'
     },
     camera1: {
-        // color: 'green',
         marginHorizontal: 16,
         marginTop: 20,
     },

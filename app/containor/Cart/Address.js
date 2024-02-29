@@ -8,12 +8,16 @@ import { useDispatch, useSelector } from 'react-redux';
 import { addAdress, deleteAddress, deleteAdress, editAddress } from '../../redux/slice/auth.slice';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import CheckOut from './CheckOut';
 
 
-export default function Address({ navigation }) {
+export default function Address({ navigation, route }) {
+
+
+
   const [update, setupdate] = useState(false)
   const [olddata, setolddata] = useState(null)
-  
+
 
   const addresSceheme = yup.object({
     name: yup.string().required(),
@@ -27,7 +31,6 @@ export default function Address({ navigation }) {
   const dispatch = useDispatch()
 
   const auth = useSelector(state => state.auth)
-  
 
   const handleDelete = (user) => {
     // console.log("55555555555555555555555555555555555555",user);
@@ -53,13 +56,16 @@ export default function Address({ navigation }) {
     },
     validationSchema: addresSceheme,
     onSubmit: (values, { resetForm }) => {
-      console.log("*************************************", values)
-
-      if (update) {
-        console.log("updateeeeeeeeeeeeeeeeeee");
-        dispatch(editAddress({ address: values, olddata ,uid: auth.user.uid }))
+      if (route.params?.previous_screen === 'CheckOut') {
+        console.log("oooooooooooooooooooooooooooooooooooooooo");
+        navigation.navigate('CheckOut')
+        dispatch(addAdress({ address: values, uid: auth.user.uid }))
       } else {
-      dispatch(addAdress({ address: values, uid: auth.user.uid }))
+        if (update) {
+          dispatch(editAddress({ address: values, olddata, uid: auth.user.uid }))
+        } else {
+          dispatch(addAdress({ address: values, uid: auth.user.uid }))
+        }
       }
 
       setupdate(false)
@@ -68,11 +74,8 @@ export default function Address({ navigation }) {
   })
 
   const { handleChange, handleBlur, setValues, touched, handleSubmit, errors, values, } = formik;
-
-  console.log("kkkkkkkkkkkkkkkkkkkkkk",errors);
-
+  
   const List = ({ user }) => {
-    // console.log("uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu", user);
     return (
       <View style={style.container}>
         <Text style={style.text}> address : {user.address}</Text>
@@ -162,15 +165,16 @@ export default function Address({ navigation }) {
           <AppButton
             titel="SAVE ADDRESS"
             onPress={handleSubmit}
-          // onPress={() =>{ navigation.navigate('Payment'), handleSubmit()}}
+
           />
-          <View>
+          
             <FlatList
               data={auth.user.address}
               renderItem={({ item }) => <List user={item} />}
               keyExtractor={item => item.i}
+              scrollEnabled={false}
             />
-          </View>
+          
         </View>
 
       </ScrollView>
@@ -203,3 +207,17 @@ const style = StyleSheet.create({
     marginHorizontal: 16,
   }
 })
+
+// Next
+//   Order
+//   {
+//     uid: 'dddew'
+//     items: [
+//       {pid: '44', qty: 2, price: 100},
+//       {pid: '22', qty: 1, price: 1000}
+//     ],
+//     shipping_address: "dsdsddsd",
+//     status: "pending",
+//     total: 1100
+//   }
+    

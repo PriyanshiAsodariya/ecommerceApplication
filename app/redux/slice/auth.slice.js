@@ -1,11 +1,9 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 import auth, { firebase } from '@react-native-firebase/auth';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-// import auth from '@react-native-firebase/auth';
 import { LoginManager, AccessToken } from 'react-native-fbsdk-next';
 import firestore from '@react-native-firebase/firestore';
 import { useSelector } from "react-redux";
-
 import storage from '@react-native-firebase/storage';
 
 
@@ -97,15 +95,12 @@ export const Loginwithemail = createAsyncThunk(
 export const sigingoogle = createAsyncThunk(
     'auth/sigingoogle',
     async () => {
-        // Check if your device supports Google Play
         await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-        // Get the users ID token
+    
         const user = await GoogleSignin.signIn();
 
-        // Create a Google credential with the token
         const googleCredential = auth.GoogleAuthProvider.credential(user.idToken);
 
-        // Sign-in the user with the credential
         return auth().signInWithCredential(googleCredential);
 
     }
@@ -115,7 +110,7 @@ export const siginFacebook = createAsyncThunk(
     'auth/signInFacebook',
     async () => {
         try {
-            // Attempt login with permissions
+           
             const result = await LoginManager.logInWithPermissions(['public_profile', "email"]);
 
             if (result.isCancelled) {
@@ -123,7 +118,7 @@ export const siginFacebook = createAsyncThunk(
                 throw 'User cancelled the login process';
             }
 
-            // Once signed in, get the user's AccessToken
+           
             const data = await AccessToken.getCurrentAccessToken();
 
             if (!data) {
@@ -149,11 +144,11 @@ export const addAdress = createAsyncThunk(
     async (data) => {
         console.log("ddddddddddddddddddddddddddddd", data, data.uid);
 
-        //update    uid     
+     
         await firestore()
             .collection('user')
             .doc(data.uid)
-            // .update({ address: data.address })
+         
             .update({
                 address: firebase.firestore.FieldValue.arrayUnion(data.address)
             })
@@ -186,7 +181,7 @@ export const deleteAddress = createAsyncThunk(
             await firestore()
                 .collection('user')
                 .doc(data.uid)
-                // .update({ address: data.address })
+              
                 .update({
                     address: firebase.firestore.FieldValue.arrayRemove(data.address)
                 })
@@ -218,12 +213,12 @@ export const deleteAddress = createAsyncThunk(
 export const editAddress = createAsyncThunk(
     'auth/editAddress',
     async (data) => {
-        console.log("eddddiiitttttttttttt", data);
+       
         try {
             await firestore()
                 .collection('user')
                 .doc(data.uid)
-                // .update({ address: data.address })
+               
                 .update({
                     address: firebase.firestore.FieldValue.arrayRemove(data.olddata)
                 })
@@ -231,13 +226,12 @@ export const editAddress = createAsyncThunk(
                     console.log('address delete!');
                 });
         } catch (error) {
-            console.log("eeeeeeeeeeeeeeee", error);
+          
         }
 
         await firestore()
             .collection('user')
             .doc(data.uid)
-            // .update({ address: data.address })
             .update({
                 address: firebase.firestore.FieldValue.arrayUnion(data.address)
             })
@@ -259,29 +253,16 @@ export const editAddress = createAsyncThunk(
                 }
             });
         return { ...userData, uid: data.uid }
-
     }
-
-
-
-
-
-
 )
 
 export const profileAdd = createAsyncThunk(
     'auth/profile',
     async (data) => {
-        console.log("mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm",data.imgUrl);
         if (typeof data.imgUrl === 'string') {
-           
-
             const oldImgRef = storage().ref('Profile/' + data.imgName);
             await oldImgRef.delete();
-
         }
-
-            console.log("profilllllllllleeeeeeeeee", data);
 
             console.log(data.image.path);
 
@@ -296,9 +277,7 @@ export const profileAdd = createAsyncThunk(
             const imgRef = await storage().ref(imgRefPath);
             const task = await imgRef.putFile(data.image.path);
 
-            console.log("ppppppppppppppppppppppppppppppppppppppppp", imgRefPath);
             const url = await storage().ref(imgRefPath).getDownloadURL();
-            console.log("uuuuuuuuuuuuuuuuuuuu", url);
 
             await firestore()
                 .collection('user')
@@ -308,7 +287,6 @@ export const profileAdd = createAsyncThunk(
                     console.log('Profile image and number updated successfully!');
                 });
         
-
         let userData;
         await firestore()
             .collection('user')
@@ -347,98 +325,7 @@ export const userInfo = createAsyncThunk(
     }
 )
 
-    // export const profileAdd = createAsyncThunk(
-    //     'auth/profile',
-    //     async (data) => {
-    //         try {
-    //             // Check if the old image exists
-    //             const oldImgRef = storage().ref(imgRefPath);
-    //             const oldImgExists = await oldImgRef.exists();
-
-    //             // If the old image exists, delete it
-    //             if (oldImgExists) {
-    //                 await oldImgRef.delete();
-    //                 console.log('Old image deleted successfully');
-    //             } else {
-    //                 console.log('Old image does not exist');
-    //             }
-
-    //             // Upload the new image
-    //             const temparr = data.image.path.split('/')
-    //             const imgName = temparr[temparr.length - 1];
-
-    //             const mathId = Math.floor(Math.random() * 1000);
-
-    //             const imgfinalName = mathId + '--' + imgName;
-    //             const imgRefPath = 'Profile/' + imgfinalName;
-    //             const imgRef = storage().ref(imgRefPath);
-    //             await imgRef.putFile(data.values.image.path);
-
-    //             // Get the download URL of the new image
-    //             const url = await imgRef.getDownloadURL();
-
-    //             // Update user profile in Firestore with the new image details
-    //             await firestore()
-    //                 .collection('user')
-    //                 .doc(data.uid)
-    //                 .update({ imgName: imgName, imgUrl: url, number: data.values.number });
-
-    //             console.log('Profile image updated successfully!');
-    //         } catch (error) {
-    //             console.error('Error updating profile image:', error);
-    //             // Handle errors appropriately
-    //         }
-    //     }
-    // );
-
-    // export const profileAdd = createAsyncThunk(
-    //     'auth/profile',
-    //     async (data) => {
-    //         try {
-    //             // Attempt to delete the old image
-
-    //             const storageRef = storage().ref();
-    //             const oldImgRef = storageRef.child(imgRefPath);
-
-    //             await oldImgRef.delete();
-    //             console.log('Old image deleted successfully');
-    //         } catch (error) {
-    //             // Handle errors during deletion
-    //             if (error.code === 'storage/object-not-found') {
-    //                 // Ignore this error since it means the object doesn't exist
-    //                 console.log('Old image does not exist');
-    //             } else {
-    //                 // Handle other errors
-    //                 console.error('Error deleting old image:', error);
-    //             }
-    //         }
-
-    //         // Upload the new image
-    //         const temparr = data.values.image.path.split('/')
-    //         const imgName = temparr[temparr.length - 1];
-
-    //         const mathId = Math.floor(Math.random() * 1000);
-
-    //         const imgfinalName = mathId + '--' + imgName;
-    //         const imgRefPath = 'Profile/' + imgfinalName;
-    //         const imgRef = storage().ref(imgRefPath);
-    //         await imgRef.putFile(data.values.image.path);
-
-    //         // Get the download URL of the new image
-    //         const url = await imgRef.getDownloadURL();
-
-    //         // Update user profile in Firestore with the new image details
-    //         await firestore()
-    //             .collection('user')
-    //             .doc(data.uid)
-    //             .update({ imgName: imgName, imgUrl: url, number: data.values.number });
-
-    //         console.log('Profile image updated successfully!');
-    //     }
-    // );
-
-    ;
-
+   
 export const authslice = createSlice({
     name: 'auth',
     initialState,
@@ -489,51 +376,8 @@ export const authslice = createSlice({
 export default authslice.reducer
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 //console.log.*$
 
 
 
-  // async (data) => {
-        //     console.log("profilllllllllleeeeeeeeee", data);
-
-        //     console.log(data.values.image.path);
-
-        //     let temparr = data.values.image.path.split('/')
-        //     let imgName = temparr[temparr.length - 1];
-
-        //     const mathId = Math.floor(Math.random() * 1000);
-
-        //     const imgfinalName = mathId + '--' + imgName;
-
-
-        //     const imgRefPath = 'Profile/' + imgfinalName;
-
-        //     const imgRef = await storage().ref(imgRefPath);
-        //     const task = await imgRef.putFile(data.values.image.path);
-
-
-        //     console.log("ppppppppppppppppppppppppppppppppppppppppp", imgRefPath);
-        //     const url = await storage().ref(imgRefPath).getDownloadURL();
-        //     console.log("uuuuuuuuuuuuuuuuuuuu", url);
-
-         
-        //     await firestore()
-        //         .collection('user')
-        //         .doc(data.uid)
-        //         .update({ imgName: imgfinalName, imgUrl: url, number: data.values.number })
-        //         .then(() => {
-        //             console.log('number add!');
-        //         });
-        // }
+  
