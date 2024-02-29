@@ -2,10 +2,11 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native'
 import React from 'react'
 import Feather from 'react-native-vector-icons/Feather';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
-export default function BagCard({ quantity, imgurl, color, size, price, Product, incQty, decQty ,remove}) {
+export default function Order({ quantity, imgurl, color, size, price, Product, remove }) {
 
     return (
         <View>
+
             <View style={style.bagbox}>
                 <View style={style.imgbox}>
                     <Image
@@ -16,24 +17,18 @@ export default function BagCard({ quantity, imgurl, color, size, price, Product,
                 <View style={style.disbox}>
                     <Text style={{ fontSize: 20, marginTop: 3, marginLeft: 12, color: 'black' }}>{Product}</Text>
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={{ fontSize: 8, marginLeft: 10 }}><Text style={{ color: 'grey' }}>Color: </Text><Text style={{ fontSize: 10, color: 'black'}}>{color}</Text></Text>
-                        <Text style={{ fontSize: 8, marginLeft: 10 }}><Text style={{ color: 'grey' }}>Size:</Text> <Text style={{ fontSize: 10, color: 'black' }}>{size}</Text></Text>
                     </View>
                     <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                        <TouchableOpacity disabled ={quantity > 1 ? false : true} style={style.plus} onPress={decQty}>
-                            <Feather name="minus" size={20} color="gray" />
-                        </TouchableOpacity>
-                        <Text style={{ fontSize: 20, color: 'black', marginTop: 10, marginLeft: 15 }}>{quantity}</Text>
-                        <TouchableOpacity style={style.plus} onPress={incQty} >
-                            <Feather name="plus" size={20} color="gray"/>
-                        </TouchableOpacity>
+                        <View style={{ flexDirection: 'row', marginTop: 8 }}>
+                            <Text style={{ fontSize: 15, marginLeft: 20 }}>Quantity:<Text style={style.orderdetail}>{quantity}</Text></Text>
+                            <Text style={{ fontSize: 15, marginTop: 35, marginLeft: -40, }}>Total Amount:  <Text style={style.orderdetail}>{price}</Text></Text>
+                        </View>
                     </View>
                 </View>
                 <View style={style.iconbtn}>
                     <TouchableOpacity style={{ marginLeft: 8, marginTop: 5 }} onPress={remove}>
                         <MaterialCommunityIcons name="cart-remove" size={25} color="grey"/>
                     </TouchableOpacity>
-                    <Text style={{ fontSize: 16, color: "black", marginTop: 40, fontWeight:'bold' }}>{price}</Text>
                 </View>
             </View>
         </View>
@@ -42,7 +37,7 @@ export default function BagCard({ quantity, imgurl, color, size, price, Product,
 const style = StyleSheet.create({
     bagbox: {
         width: "90%",
-        height: 120,
+        height: 150,
         flexDirection: 'row',
         marginTop: 20,
         marginLeft: 20,
@@ -50,6 +45,11 @@ const style = StyleSheet.create({
         shadowOpacity: 0.10,
         shadowRadius: 30,
         backgroundColor: "white",
+    },
+    orderdetail: {
+        fontSize: 18,
+        color: 'black',
+        fontWeight: 'bold'
     },
     imgbox: {
         width: "30%",
@@ -59,6 +59,7 @@ const style = StyleSheet.create({
     disbox: {
         width: "55%",
         height: '100%',
+
     },
     iconbtn: {
         width: '25%',

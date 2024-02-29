@@ -5,6 +5,7 @@ import Feather from 'react-native-vector-icons/Feather';
 import { horizontalScale, verticalScale } from '../../Constant/Metrics';
 import { useDispatch, useSelector } from 'react-redux';
 import { getOrder } from '../../redux/slice/orderSlice';
+import OrderDetail from './OrderDetail';
 // import Slider from 'react-native-slider';
 
 export default function MyOrder({ navigation }) {
@@ -20,7 +21,6 @@ export default function MyOrder({ navigation }) {
 
   const orderData = useSelector(state => state.order);
   // console.log("oooooooooooo", orderData);
-
 
   return (
     <View>
@@ -39,22 +39,21 @@ export default function MyOrder({ navigation }) {
       <ScrollView>
         {
           orderData.order.orders?.map((v1) => {
-            return v1.items.map((items) => {
-              return (
-                  <Orderinput
-                    ordernumber={v1.orderNo}
-                    date={v1.date}
-                    TNumber={items.id}
-                    Quantity={items.quantity}
-                    Amount={items.price * items.quantity}
-                    Status={v1.status}
-                  />
-                
-              )
-            })
+            const totalquantity = v1.items.reduce((acc, v1) => acc + v1.quantity, 0)
+            // console.log("TTTTTTTTTTTT", totalquantity);
+            return (
+              <Orderinput
+                key={v1.id}
+                ordernumber={v1.orderNo}
+                date={v1.date}
+                Quantity={totalquantity}
+                Amount={v1.total}
+                Status={v1.status}
+                onPress={() => navigation.navigate('OrderDetail', { orderNo: v1.orderNo })}
+              />
+            )
           })
         }
-
       </ScrollView>
     </View>
   )

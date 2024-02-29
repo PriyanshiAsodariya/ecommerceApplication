@@ -36,9 +36,10 @@ export const getOrder = createAsyncThunk(
 
 export const AddOrder = createAsyncThunk(
     'order/AddOrder',
+    
     async (data) => {
         // console.log("ooooooooooooooooooooooUIDDDD", data.uid);
-        // console.log("oooooooooooooooooooooDataaaa", data.pdata)
+        console.log("oooooooooooooooooooooDataaaa", data.pdata)
         // console.log("oooooooooooooooooooooAddress", data.v);
 
         const documentSnapshot = await firestore()

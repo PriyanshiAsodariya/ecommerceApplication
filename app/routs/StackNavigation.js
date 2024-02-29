@@ -23,6 +23,7 @@ import productCrud from '../containor/ProductCrud';
 import ProductCrud from '../containor/ProductCrud';
 import ProfileSetting from '../containor/Profile/ProfileSetting';
 import CheckOut from '../containor/Cart/CheckOut';
+import OrderDetail from '../containor/Profile/OrderDetail';
 // import password from '../containor/Password';
 
 
@@ -407,6 +408,7 @@ export default function StackNavigation({ navigation }) {
       <Stack.Screen name='productCrud' component={ProductCrud} />
       <Stack.Screen name='ProfileSetting' component={ProfileSetting} options={{headerShown : false}} />
       <Stack.Screen name='CheckOut' component={CheckOut}  />
+      <Stack.Screen name='OrderDetail' component={OrderDetail}  />
     </Stack.Navigator>
   )
 }
