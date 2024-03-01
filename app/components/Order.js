@@ -15,7 +15,7 @@ export default function Order({ quantity, imgurl, color, size, price, Product, r
                     />
                 </View>
                 <View style={style.disbox}>
-                    <Text style={{ fontSize: 20, marginTop: 3, marginLeft: 12, color: 'black' }}>{Product}</Text>
+                    <Text style={{ fontSize: 20, marginTop: 3, marginLeft: 0, color: 'black' , }}>{Product}</Text>
                     <View style={{ flexDirection: 'row' }}>
                     </View>
                     <View style={{ flexDirection: 'row', marginTop: 10 }}>
@@ -25,11 +25,7 @@ export default function Order({ quantity, imgurl, color, size, price, Product, r
                         </View>
                     </View>
                 </View>
-                <View style={style.iconbtn}>
-                    <TouchableOpacity style={{ marginLeft: 8, marginTop: 5 }} onPress={remove}>
-                        <MaterialCommunityIcons name="cart-remove" size={25} color="grey"/>
-                    </TouchableOpacity>
-                </View>
+                
             </View>
         </View>
     )
@@ -59,6 +55,7 @@ const style = StyleSheet.create({
     disbox: {
         width: "55%",
         height: '100%',
+        marginHorizontal : 16
 
     },
     iconbtn: {

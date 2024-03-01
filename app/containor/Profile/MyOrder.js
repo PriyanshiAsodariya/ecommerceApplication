@@ -49,7 +49,7 @@ export default function MyOrder({ navigation }) {
                 Quantity={totalquantity}
                 Amount={v1.total}
                 Status={v1.status}
-                onPress={() => navigation.navigate('OrderDetail', { orderNo: v1.orderNo })}
+                onPress={() => navigation.navigate('OrderDetail', { orderNo: v1.orderNo , total : v1.total})}
               />
             )
           })
