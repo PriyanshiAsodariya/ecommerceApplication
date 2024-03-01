@@ -12,27 +12,25 @@ export default function OrderDetail({ navigation }) {
   const orderData = useSelector(state => state.order);
   const productData = useSelector(state => state.Product)
 
-  // console.log("orderrrrr", orderData.order.orders);
-  // console.log("PPPPPPPPPPPPPPPPPPP",productData.Product);
+
 
   const route = useRoute();
   const totalamount = route.params.total
   const orderNo = route.params?.orderNo;
-  // console.log("NNNNNNNNNNNNN", orderNo);
+
 
   const filteredOrders = orderData.order.orders.filter(v => v.orderNo === orderNo);
-  console.log("ffffffffffff", filteredOrders);
+
 
   return (
     <View>
 
       {
         filteredOrders.map((order) => {
-          console.log("ooooooooooo", order);
+     
           return order.items.map((items) => {
-            console.log("iiiiiiiiiii", items);
+
             const fdata = productData.Product.filter((p) => p.id === items.id)
-            console.log("dddddddddddddddd", fdata);
             return (
               fdata.map((f, index) => {
                 return (
@@ -54,39 +52,22 @@ export default function OrderDetail({ navigation }) {
         })
       }
 
-      <View style={{ width: '80%', height: 50, borderWidth: 2, backgroundColor: 'white', borderRadius: 10, alignSelf: 'center', marginTop: 20, flexDirection: 'row', padding: 8 }}>
+      <View style={{ width: '80%', height: 50, backgroundColor: 'white', borderRadius: 10, alignSelf: 'center', marginTop: 20, flexDirection: 'row', padding: 8 }}>
         <Text style={{ fontWeight: 'bold', fontSize: 20, marginLeft: 25 }}>Total Amount : </Text><Text style={{ fontSize: 20, color: 'green', fontWeight: 'bold' }}>{totalamount}</Text>
       </View>
 
       {
         filteredOrders.map((data) => {
-          console.log("DDDDDDDDDDD", data.shipping_address);
+          // console.log("DDDDDDDDDDD", data.shipping_address);
           return (
-            <View style={{ width: '90%', height: 'auto', borderWidth: 2, marginHorizontal: 16, marginTop: 20, borderRadius: 10, padding: 10, }}>
+            <View style={{ width: '90%', height: 'auto',backgroundColor : 'white', marginHorizontal: 16, marginTop: 20, borderRadius: 10, padding: 10, }}>
               <Text style={style.address}>Shipping Address:</Text>
-              <View style={style.viewadd}>
-                <Text style={style.text}>Name : </Text><Text style={style.add_detail}>{data.shipping_address.name}</Text>
-              </View>
 
-              <View style={style.viewadd}>
-                <Text style={style.text}>Address : </Text><Text style={style.add_detail}>{data.shipping_address.address}</Text>
-              </View>
+              <Text style={style.name}>{data.shipping_address.name}</Text>
 
-              <View style={style.viewadd}>
-                <Text style={style.text}>City : </Text><Text style={style.add_detail}>{data.shipping_address.city}</Text>
-              </View>
+              <Text style={style.add_detail}>{data.shipping_address.address} ,{data.shipping_address.city} {data.shipping_address.country}{data.shipping_address.state} {data.shipping_address.pinCode}</Text>
 
-              <View style={style.viewadd}>
-                <Text style={style.text}>Country : </Text><Text style={style.add_detail}>{data.shipping_address.country}</Text>
-              </View>
-
-              <View style={style.viewadd}>
-                <Text style={style.text}>State : </Text><Text style={style.add_detail}>{data.shipping_address.state}</Text>
-              </View>
-
-              <View style={style.viewadd}>
-                <Text style={style.text}>PinCode : </Text><Text style={style.add_detail}>{data.shipping_address.pinCode}</Text>
-              </View>
+              
             </View>
           )
         })
@@ -98,7 +79,7 @@ export default function OrderDetail({ navigation }) {
 
 const style = StyleSheet.create({
   address: {
-    color: 'black',
+    color: 'grey',
     fontSize: 20,
     fontWeight: 'bold',
     marginLeft: 8,
@@ -111,11 +92,16 @@ const style = StyleSheet.create({
 
   },
   add_detail: {
-    color: 'black'
+    color: 'grey',
+    marginLeft : 16,
 
   },
-  text: {
-    color: 'black',
-    fontWeight: 'bold'
-  }
+  name :{
+    color :'black',
+    fontWeight  :'bold',
+    fontSize : 16,
+    color :'black',
+    marginHorizontal : 16
+  },
+ 
 })
