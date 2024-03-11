@@ -84,7 +84,6 @@ export default function ProfileSetting({ navigation }) {
             <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
                 <MaterialIcons style={style.icon} name="keyboard-arrow-left" color={'black'} size={34} />
             </TouchableOpacity>
-
             <View>
                 <TouchableOpacity onPress={toggleModal} style={{ width: 150, height: 150, backgroundColor: 'black', borderRadius: 100, alignSelf: 'center', marginTop: 20 }} >
                     <Image
@@ -97,7 +96,6 @@ export default function ProfileSetting({ navigation }) {
             <TouchableOpacity onPress={handleModal}>
                 <MaterialIcons style={style.camera} name="camera-alt" color={'black'} size={34} />
             </TouchableOpacity>
-
             <Modal
                 animationType="slide"
                 transparent={true}
