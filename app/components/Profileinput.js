@@ -15,6 +15,6 @@ export default function Profileinput({ name, titel, onPress }) {
           <Feather name='chevron-right' color="#9B9B9B" size={20}/>
         </TouchableOpacity>
       </TouchableOpacity>
-    </View >
+    </View>
   )
 }

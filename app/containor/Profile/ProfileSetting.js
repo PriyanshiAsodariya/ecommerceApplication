@@ -13,8 +13,13 @@ import { profileAdd, userInfo } from '../../redux/slice/auth.slice';
 export default function ProfileSetting({ navigation }) {
     const [modal, setmodel] = useState(false)
 
-    const dispatch = useDispatch()
+    const [isModalVisible, setModalVisible] = useState(false);
 
+    const toggleModal = () => {
+        setModalVisible(true);
+    }
+
+    const dispatch = useDispatch()
 
     const handleModal = () => {
         setmodel(true)
@@ -22,9 +27,8 @@ export default function ProfileSetting({ navigation }) {
 
     const handlecross = () => {
         setmodel(false)
+        setModalVisible(false);
     }
-
-
 
     const auth = useSelector(state => state.auth)
 
@@ -75,23 +79,40 @@ export default function ProfileSetting({ navigation }) {
 
     const { handleChange, handleBlur, setFieldValue, setValues, touched, handleSubmit, errors, values, } = formik;
 
-    // console.log("oooooooooooooooooo",errors);
     return (
         <View>
-
             <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
                 <MaterialIcons style={style.icon} name="keyboard-arrow-left" color={'black'} size={34} />
             </TouchableOpacity>
 
-            <View style={{ width: 150, height: 150, backgroundColor: 'black', borderRadius: 100, alignSelf: 'center', marginTop: 20 }}>
-                <Image
-                    source={auth.user?.imgUrl ? auth.user.imgUrl : require('../../../assets/Images/profile.jpg')}
-                />
+            <View>
+                <TouchableOpacity onPress={toggleModal} style={{ width: 150, height: 150, backgroundColor: 'black', borderRadius: 100, alignSelf: 'center', marginTop: 20 }} >
+                    <Image
+                        source={{ uri: auth.user.imgUrl }}
+                        style={{ width: '100%', height: '100%', borderRadius: 100, }}
+                    />
+                </TouchableOpacity>
             </View>
-            
+
             <TouchableOpacity onPress={handleModal}>
                 <MaterialIcons style={style.camera} name="camera-alt" color={'black'} size={34} />
             </TouchableOpacity>
+
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={isModalVisible}
+            >
+                <View style={{ backgroundColor: 'white', width: '100%', alignSelf: 'center', height: 800, borderRadius: 10 }}>
+                    <TouchableOpacity onPress={handlecross} style={{ marginLeft: horizontalScale(150) }}>
+                    <MaterialIcons style={style.icon1} name="keyboard-arrow-left" color={'black'} size={34}  />
+                    </TouchableOpacity>
+                    <Image
+                        source={{ uri: auth.user.imgUrl }}
+                        style={{ width: 400, height: 500, marginTop :100, alignSelf:'center' }}
+                    />
+                </View>
+            </Modal>
 
             <Modal
                 animationType="slide"
@@ -152,6 +173,11 @@ const style = StyleSheet.create({
     icon: {
         marginTop: 15,
         marginHorizontal: 16,
+    },
+    icon1: {
+        marginTop: 15,
+        marginHorizontal: 16,
+        marginRight:150,
     },
     camera: {
         position: 'absolute',

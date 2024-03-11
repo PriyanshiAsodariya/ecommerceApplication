@@ -3,9 +3,24 @@ import React from 'react'
 import Profileinput from '../../components/Profileinput'
 import { horizontalScale, moderateScale, verticalScale } from '../../Constant/Metrics'
 import Address from '../Cart/Address'
+import { useDispatch, useSelector } from 'react-redux'
+import { firebase } from '@react-native-firebase/auth'
+import { signOut } from '../../redux/slice/auth.slice'
 
 
 export default function MyProfile({ navigation }) {
+
+  const authdata = useSelector(state => state.auth)
+  console.log("aaaaaaaaaaaaaaaaaaaaaa",authdata.user.email);
+
+  const dispatch  = useDispatch()
+
+  const handleLogout = async() => {
+    dispatch(signOut({data : authdata.user.email}))
+    console.log("okkkkkkkkkkkkkk");
+   
+  }
+
   return (
     <View>
       <Text style={{ color: 'black', fontSize: moderateScale(30), marginHorizontal: horizontalScale(16), marginTop: verticalScale(30), fontFamily: 'Metropolis-Bold.otf', fontWeight: 'bold' }}>My Profile</Text>
@@ -13,7 +28,7 @@ export default function MyProfile({ navigation }) {
         <TouchableOpacity onPress={() => navigation.navigate('ProfileSetting')}>
           <View style={{ width: horizontalScale(80), height: verticalScale(80), backgroundColor: 'black', borderRadius: 100 }}>
             <Image
-              source={require('../../../assets/Images/profile.jpg')}
+              source={{uri : authdata.user.imgUrl}}
               style={{ width: '100%', height: '100%', borderRadius: 100 }}
             />
           </View>
@@ -55,8 +70,12 @@ export default function MyProfile({ navigation }) {
       />
 
       <Profileinput
-        name="Settings"
+        name="LogOut"
         titel="Notifications                   "
+        onPress={() => handleLogout()}
+
+
+
       />
     </View>
   )

@@ -96,7 +96,7 @@ export const sigingoogle = createAsyncThunk(
     'auth/sigingoogle',
     async () => {
         await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
-    
+
         const user = await GoogleSignin.signIn();
 
         const googleCredential = auth.GoogleAuthProvider.credential(user.idToken);
@@ -110,7 +110,7 @@ export const siginFacebook = createAsyncThunk(
     'auth/signInFacebook',
     async () => {
         try {
-           
+
             const result = await LoginManager.logInWithPermissions(['public_profile', "email"]);
 
             if (result.isCancelled) {
@@ -118,7 +118,7 @@ export const siginFacebook = createAsyncThunk(
                 throw 'User cancelled the login process';
             }
 
-           
+
             const data = await AccessToken.getCurrentAccessToken();
 
             if (!data) {
@@ -144,11 +144,11 @@ export const addAdress = createAsyncThunk(
     async (data) => {
         console.log("ddddddddddddddddddddddddddddd", data, data.uid);
 
-     
+
         await firestore()
             .collection('user')
             .doc(data.uid)
-         
+
             .update({
                 address: firebase.firestore.FieldValue.arrayUnion(data.address)
             })
@@ -181,7 +181,7 @@ export const deleteAddress = createAsyncThunk(
             await firestore()
                 .collection('user')
                 .doc(data.uid)
-              
+
                 .update({
                     address: firebase.firestore.FieldValue.arrayRemove(data.address)
                 })
@@ -213,12 +213,12 @@ export const deleteAddress = createAsyncThunk(
 export const editAddress = createAsyncThunk(
     'auth/editAddress',
     async (data) => {
-       
+
         try {
             await firestore()
                 .collection('user')
                 .doc(data.uid)
-               
+
                 .update({
                     address: firebase.firestore.FieldValue.arrayRemove(data.olddata)
                 })
@@ -226,9 +226,8 @@ export const editAddress = createAsyncThunk(
                     console.log('address delete!');
                 });
         } catch (error) {
-          
-        }
 
+        }
         await firestore()
             .collection('user')
             .doc(data.uid)
@@ -256,6 +255,23 @@ export const editAddress = createAsyncThunk(
     }
 )
 
+export const signOut = createAsyncThunk(
+    'auth/signOut',
+    async (data) => {
+        console.log("DDDDDDDDDDDDDDDDDDDDD", data);
+        try {
+            await firebase.auth().signOut(data)
+                .then(() => 'user signed out');
+        } catch (error) {
+            console.log("eeeeeeeeeeeeee", error)
+            
+            return null;
+        }
+
+       
+    }
+)
+
 export const profileAdd = createAsyncThunk(
     'auth/profile',
     async (data) => {
@@ -264,29 +280,29 @@ export const profileAdd = createAsyncThunk(
             await oldImgRef.delete();
         }
 
-            console.log(data.image.path);
+        console.log(data.image.path);
 
-            let temparr = data.image.path.split('/')
-            let imgName = temparr[temparr.length - 1];
+        let temparr = data.image.path.split('/')
+        let imgName = temparr[temparr.length - 1];
 
-            const mathId = Math.floor(Math.random() * 1000);
+        const mathId = Math.floor(Math.random() * 1000);
 
-            const imgfinalName = mathId + '--' + imgName;
-            const imgRefPath = 'Profile/' + imgfinalName;
+        const imgfinalName = mathId + '--' + imgName;
+        const imgRefPath = 'Profile/' + imgfinalName;
 
-            const imgRef = await storage().ref(imgRefPath);
-            const task = await imgRef.putFile(data.image.path);
+        const imgRef = await storage().ref(imgRefPath);
+        const task = await imgRef.putFile(data.image.path);
 
-            const url = await storage().ref(imgRefPath).getDownloadURL();
+        const url = await storage().ref(imgRefPath).getDownloadURL();
 
-            await firestore()
-                .collection('user')
-                .doc(data.uid)
-                .update({ imgName: imgfinalName, imgUrl: url, number: data.number })
-                .then(() => {
-                    console.log('Profile image and number updated successfully!');
-                });
-        
+        await firestore()
+            .collection('user')
+            .doc(data.uid)
+            .update({ imgName: imgfinalName, imgUrl: url, number: data.number })
+            .then(() => {
+                console.log('Profile image and number updated successfully!');
+            });
+
         let userData;
         await firestore()
             .collection('user')
@@ -310,22 +326,22 @@ export const userInfo = createAsyncThunk(
         console.log("okkkkkkkkkkkkkkkkk", data);
         let userData;
         await firestore()
-        .collection('user')
-        .doc(data)
-        .get()
-        .then(documentSnapshot => {
-            console.log('User exists: ', documentSnapshot.exists);
+            .collection('user')
+            .doc(data)
+            .get()
+            .then(documentSnapshot => {
+                console.log('User exists: ', documentSnapshot.exists);
 
-            if (documentSnapshot.exists) {
-                console.log('User data: ', documentSnapshot.data());
-                userData = documentSnapshot.data();
-            }
-        });
-    return { ...userData, uid: data }
+                if (documentSnapshot.exists) {
+                    console.log('User data: ', documentSnapshot.data());
+                    userData = documentSnapshot.data();
+                }
+            });
+        return { ...userData, uid: data }
     }
 )
 
-   
+
 export const authslice = createSlice({
     name: 'auth',
     initialState,
@@ -369,6 +385,10 @@ export const authslice = createSlice({
             // console.log("productttttt actionnnn ", action);
             state.user = action.payload
         })
+        builder.addCase(signOut.fulfilled, (state, action) => {
+            // console.log("productttttt actionnnn ", action);
+            state.user = action.payload
+        })
     }
 })
 
@@ -380,4 +400,3 @@ export default authslice.reducer
 
 
 
-  
