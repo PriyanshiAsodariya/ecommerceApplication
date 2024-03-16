@@ -173,6 +173,27 @@ export const addAdress = createAsyncThunk(
     }
 )
 
+export const getaddress = createAsyncThunk(
+    'auth/getaddress',
+    async () => {
+        let data ;
+        
+       await firestore()
+            .collection('user')
+            .get()
+            .then(querySnapshot => {
+
+                querySnapshot.forEach(documentSnapshot => {
+                    // console.log('User datttttttttttttttttttaaaaa: ', documentSnapshot.data());
+                    data = documentSnapshot.data();
+                   
+                });
+            
+            });
+            return  data;
+    }
+)
+
 export const deleteAddress = createAsyncThunk(
     'auth/deleteAddress',
     async (data) => {
@@ -264,11 +285,11 @@ export const signOut = createAsyncThunk(
                 .then(() => 'user signed out');
         } catch (error) {
             console.log("eeeeeeeeeeeeee", error)
-            
+
             return null;
         }
 
-       
+
     }
 )
 
@@ -373,7 +394,7 @@ export const authslice = createSlice({
         })
         builder.addCase(editAddress.fulfilled, (state, action) => {
 
-            console.log("actionnnnnnnnnnnnnn", action.payload);
+            // console.log("actionnnnnnnnnnnnnn", action.payload);
             state.user = action.payload
 
         })
@@ -387,6 +408,10 @@ export const authslice = createSlice({
         })
         builder.addCase(signOut.fulfilled, (state, action) => {
             // console.log("productttttt actionnnn ", action);
+            state.user = action.payload
+        })
+        builder.addCase(getaddress.fulfilled, (state, action) => {
+            // console.log("productttttt actionnnn ", action.payload);
             state.user = action.payload
         })
     }

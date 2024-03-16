@@ -363,7 +363,7 @@ export default function StackNavigation({ navigation }) {
       />
 
       <Stack.Screen name='Payment' component={Payment}
-        options={{ headerTitle: 'Checkout', headerTitleAlign: 'center' }} />
+        options={{ headerTitle: 'Payment', headerTitleAlign: 'center' }} />
       <Stack.Screen name='Success' component={Success}
         options={{
           headerLeft: () => (

@@ -24,10 +24,11 @@ export default function MyBag({ navigation }) {
   const pricedata = allcartData.map((p)=>{
     console.log(p,"ppppppppppppp");
     const pdata = cartdata.cart.find((c)=> c.id === p.id)
+    console.log("uuuuuuuuuuuuuuuuu",pdata);
     return {...pdata , price : p.price}
+    
   })
-
-
+ 
   console.log(pricedata,"jjjjjjjjjjjjjj");
 
   

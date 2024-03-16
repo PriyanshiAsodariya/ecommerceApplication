@@ -11,25 +11,18 @@ import OrderDetail from './OrderDetail';
 export default function MyOrder({ navigation }) {
 
   const [Orderstatus, SetOrderstatus] = useState('Processing')
-  console.log('ssssssssss', Orderstatus);
-
-  const [color, setcolor] = useState('Processing')
-
   const dispatch = useDispatch()
 
   const auth = useSelector(state => state.auth)
-  // console.log("uuuuuuuuuuuuu", auth.user.uid);
 
   useEffect(() => {
     dispatch(getOrder({ id: auth.user.uid }))
   }, [])
 
   const orderData = useSelector(state => state.order);
-  // console.log("oooooooooooo", orderData);
 
   return (
     <View>
-
       <View style={{ width: "100%", height: verticalScale(45), marginTop: verticalScale(10), backgroundColor: 'white', padding: 5, flexDirection: 'row', justifyContent: 'space-between' }}>
 
         <TouchableOpacity onPress={() => SetOrderstatus('Processing')} style={[style.btn1, Orderstatus === 'Processing' ? { backgroundColor: 'black' } : { backgroundColor: 'white' }]}>

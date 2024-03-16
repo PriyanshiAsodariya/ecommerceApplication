@@ -57,7 +57,7 @@ export default function Address({ navigation, route }) {
     validationSchema: addresSceheme,
     onSubmit: (values, { resetForm }) => {
       if (route.params?.previous_screen === 'CheckOut') {
-        console.log("oooooooooooooooooooooooooooooooooooooooo");
+        // console.log("oooooooooooooooooooooooooooooooooooooooo");
         navigation.navigate('CheckOut')
         dispatch(addAdress({ address: values, uid: auth.user.uid }))
       } else {
