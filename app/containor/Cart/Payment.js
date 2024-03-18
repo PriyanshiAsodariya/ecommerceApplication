@@ -113,7 +113,7 @@
 
 import { View, Text, Button, Alert } from 'react-native'
 import React, { useEffect, useState } from 'react'
-import { useStripe } from '@stripe/stripe-react-native';
+import { StripeProvider, useStripe } from '@stripe/stripe-react-native';
 import { Screen } from 'react-native-screens';
 // import { Button } from 'react-native-paper';
 
@@ -126,16 +126,16 @@ export default function Payment() {
     console.log("ffffffffff");
 
     let amt = 6000 * 100;
-    const response = await fetch('http://192.168.184.90:4242/payment-sheet', {
+    const response = await fetch('http:// 192.168.1.46:4242/payment-sheet', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body : JSON.stringify({
-        amount : amt
+      body: JSON.stringify({
+        amount: amt
       })
     });
-    const { paymentIntent, ephemeralKey, customer} = await response.json();
+    const { paymentIntent, ephemeralKey, customer } = await response.json();
 
     return {
       paymentIntent,
@@ -148,12 +148,12 @@ export default function Payment() {
       paymentIntent,
       ephemeralKey,
       customer,
-     
+
     } = await fetchPaymentSheetParams();
 
-    console.log("ppppaymentIntent",  paymentIntent,),
-    console.log( "eeeephemeralKey",ephemeralKey,);
-    console.log("Cccustomer",customer,);
+    console.log("ppppaymentIntent", paymentIntent,),
+      console.log("eeeephemeralKey", ephemeralKey,);
+    console.log("Cccustomer", customer,);
 
     const { error } = await initPaymentSheet({
       merchantDisplayName: "Example, Inc.",
@@ -167,7 +167,7 @@ export default function Payment() {
         name: 'Jane Doe',
       }
     });
-    console.log("eeeeeeeeeeee",error);
+    console.log("eeeeeeeeeeee", error);
     if (!error) {
       setLoading(true);
     }
@@ -184,6 +184,8 @@ export default function Payment() {
       Alert.alert(`Error code: ${error.code}`, error.message);
     } else {
       Alert.alert('Success', 'Your order is confirmed!');
+
+
     }
   };
 
@@ -192,13 +194,19 @@ export default function Payment() {
   }, []);
 
   return (
-    <Screen>
-      <Button
-        variant="primary"
-        // disabled={!loading}
-        title="Payment"
-        onPress={openPaymentSheet}
-      />
-    </Screen>
+    <StripeProvider
+      publishableKey='pk_test_51Ot9CkSEqMcEIWx5Zw7gnLRK5P5fkw8cpOB0CI37GMGDdB3KsCjvDtMuBIqAF7bnQgYeNKp3ef2RbeHccyLepEEp00419TcEqf'
+      merchantIdentifier="merchant.identifier" // required for Apple Pay
+      urlScheme="your-url-scheme" // required for 3D Secure and bank redirects
+    >
+      <Screen>
+        <Button
+          variant="primary"
+          // disabled={!loading}
+          title="Payment"
+          onPress={openPaymentSheet}
+        />
+      </Screen>
+    </StripeProvider>
   );
 }

@@ -18,7 +18,6 @@ export default function Address({ navigation, route }) {
   const [update, setupdate] = useState(false)
   const [olddata, setolddata] = useState(null)
 
-
   const addresSceheme = yup.object({
     name: yup.string().required(),
     city: yup.string().required(),
